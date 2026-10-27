@@ -12,7 +12,7 @@ strsplit1(x, split)
 \item{split}{This is the description of what split is}
 }
 \value{
-A character vector
+A character vector.
 }
 \description{
 Split a string
