@@ -13,3 +13,5 @@ Suggests:
 Config/testthat/edition: 3
 Imports: 
     stringr
+URL: https://github.com/cjones46/yahara
+BugReports: https://github.com/cjones46/yahara/issues
