@@ -4,8 +4,7 @@ Version: 0.0.0.9000
 Authors@R: 
     person("Cameron", "Jones", , "cjones46@wisc.edu", role = c("aut", "cre"))
 Description: Implements a Shiny+ggplot2 interactive interface to visualize a multiverse object containing a model with multiple estimands of interest.
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+License: MIT + file LICENSE
 Config/roxygen2/version: 8.1.1
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
