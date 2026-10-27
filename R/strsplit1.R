@@ -3,7 +3,7 @@
 #' @param x This is the description of what x is
 #' @param split This is the description of what split is
 #'
-#' @return A character vector
+#' @return A character vector.
 #' @export
 #'
 #' @examples
