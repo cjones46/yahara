@@ -11,7 +11,7 @@
 #' @export
 #'
 #' @examples
-#' #yahara(M, "fit_name")
+#' #yahara(SusiesMultiverse, "summary_fit")
 yahara = function(M, fit_name, highlight = rlang::exprs(), outcome_branch = "", single_term = "", conf.level = 0.95) {
 
   theme_set(theme_bw() + theme(axis.text = element_text(size = 15), axis.title = element_text(size = 18), plot.title = ggtext::element_markdown(size = 20), plot.subtitle = element_text(size = 15), plot.caption = ggtext::element_markdown(hjust = 0), axis.ticks.length = unit(0.25, "cm")))
