@@ -13,7 +13,7 @@ str_force(x, max.length = 10, truncate = "end", pad = "end")
 
 \item{truncate}{One of \code{"beginning"}, \code{"middle"}, or \code{"end"}, indicating where a too-long string should be cut off.}
 
-\item{pad}{One of}
+\item{pad}{One of \code{"beginning"} or \code{"end"} indicating where a too-short string should be padded.}
 }
 \value{
 A string with the desired characteristics.

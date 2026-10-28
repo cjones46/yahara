@@ -6,6 +6,15 @@
 \usage{
 v_str_force(x, max.length = 10, truncate = "end", pad = "end")
 }
+\arguments{
+\item{x}{The string to edit.}
+
+\item{max.length}{The length of the string that will be output.}
+
+\item{truncate}{One of \code{"beginning"}, \code{"middle"}, or \code{"end"}, indicating where a too-long string should be cut off.}
+
+\item{pad}{One of \code{"beginning"} or \code{"end"} indicating where a too-short string should be padded.}
+}
 \description{
 Vectorized version of \code{str_force}.
 }

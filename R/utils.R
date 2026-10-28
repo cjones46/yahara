@@ -3,7 +3,7 @@
 #' @param x The string to edit.
 #' @param max.length The length of the string that will be output.
 #' @param truncate One of `"beginning"`, `"middle"`, or `"end"`, indicating where a too-long string should be cut off.
-#' @param pad One of
+#' @param pad One of `"beginning"` or `"end"` indicating where a too-short string should be padded.
 #'
 #' @returns A string with the desired characteristics.
 str_force = function(x, max.length = 10, truncate = "end", pad = "end") {
@@ -33,6 +33,7 @@ str_force = function(x, max.length = 10, truncate = "end", pad = "end") {
 #' Vectorized version of `str_force`.
 #'
 #' @name v_str_force
+#' @inheritParams str_force
 v_str_force = Vectorize(str_force, "x", USE.NAMES = F)
 
 
