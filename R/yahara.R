@@ -216,7 +216,7 @@ yahara = function(M, fit_name, highlight = exprs(), outcome_branch = "", single_
 
 
       # Use lambda.min from cv.glmnet
-      fit = glmnet(x, y, family = "mgaussian", lambda = cv.glmnet(x, y, family = "mgaussian")$lambda.min)
+      fit = glmnet::glmnet(x, y, family = "mgaussian", lambda = glmnet::cv.glmnet(x, y, family = "mgaussian")$lambda.min)
 
       coefs = tibble(response = character(0), options = character(0), value = numeric(0))
       for (i in 1:length(fit$beta)) {

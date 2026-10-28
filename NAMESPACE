@@ -2,4 +2,7 @@
 
 export(str_split_one)
 export(yahara)
+import(dplyr)
+import(ggplot2)
+import(shiny)
 importFrom(magrittr,"%>%")
