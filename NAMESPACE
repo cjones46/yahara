@@ -2,3 +2,4 @@
 
 export(str_split_one)
 export(yahara)
+importFrom(magrittr,"%>%")

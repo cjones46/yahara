@@ -19,6 +19,7 @@ Imports:
     glmnet,
     grid,
     gtable,
+    magrittr,
     multiverse,
     rlang,
     scales,
