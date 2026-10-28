@@ -24,10 +24,10 @@ marginalDecisions = function(mv_data, universes, option, option_order, pretty_or
   lollipop_data = lollipop_data %>%
     select(universe, selected, all_of(mv_data[["MULTIVERSE_OPTIONS"]])) %>%
     distinct() %>%
-    pivot_longer(-c(selected, universe)) %>%
+    tidyr::pivot_longer(-c(selected, universe)) %>%
     group_by(name, selected) %>%
     summarize(perc = mean(value, na.rm = T), .groups = "drop_last") %>%
-    pivot_wider(names_from = selected, values_from = perc, names_prefix = "perc_among_") %>%
+    tidyr::pivot_wider(names_from = selected, values_from = perc, names_prefix = "perc_among_") %>%
     ungroup()
 
   summary_all = mv_data[["WIDE_MV"]] %>%
@@ -35,7 +35,7 @@ marginalDecisions = function(mv_data, universes, option, option_order, pretty_or
     distinct() %>%
     select(-universe) %>%
     summarize(across(everything(), mean)) %>%
-    pivot_longer(everything()) %>%
+    tidyr::pivot_longer(everything()) %>%
     rename(perc_among_ALL = value)
 
   full_data = left_join(summary_all, lollipop_data, by = join_by(name)) %>%
@@ -72,7 +72,7 @@ marginalDecisions = function(mv_data, universes, option, option_order, pretty_or
       ) +
       theme(
         legend.position = "none",
-        axis.text.y = element_markdown(hjust = 0.5, face = boldSelected, color = redSelected),
+        axis.text.y = ggtext::element_markdown(hjust = 0.5, face = boldSelected, color = redSelected),
         axis.ticks.x = element_blank()
       ) +
       labs(x = "\nPercent of Universes", y = NULL, caption = paste0("<br><br><br><br><br><span style = 'font-size:20pt'>Multiverse Option Frequency</span><br>", additionalSubtitleInfo))

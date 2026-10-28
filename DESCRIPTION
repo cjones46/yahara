@@ -12,19 +12,22 @@ Suggests:
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Imports: 
+    data.table,
     dplyr,
     fastDummies,
     ggplot2,
     ggtext,
     glmnet,
     grid,
-    gtable,
     magrittr,
     multiverse,
+    purrr,
     rlang,
     scales,
     shiny,
+    stats,
     stringr,
-    tidyr
+    tidyr,
+    utils
 URL: https://github.com/cjones46/yahara
 BugReports: https://github.com/cjones46/yahara/issues

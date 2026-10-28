@@ -4,4 +4,11 @@ export(yahara)
 import(dplyr)
 import(ggplot2)
 import(shiny)
+importFrom(data.table,":=")
 importFrom(magrittr,"%>%")
+importFrom(stats,
+  median,
+  qnorm,
+  reorder,
+  sd
+)

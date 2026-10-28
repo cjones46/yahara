@@ -7,24 +7,24 @@
 #'
 #' @returns A string with the desired characteristics.
 str_force = function(x, max.length = 10, truncate = "end", pad = "end") {
-  if (str_length(x) > max.length) {
+  if (stringr::str_length(x) > max.length) {
 
     if (truncate == "end") {
-      return(paste0(str_sub(x, 1, max.length), "..."))
+      return(paste0(stringr::str_sub(x, 1, max.length), "..."))
     } else if (truncate == "beginning") {
-      return(paste0("...", str_sub(x, str_length(x)-max.length+1, str_length(x))))
+      return(paste0("...", stringr::str_sub(x, stringr::str_length(x)-max.length+1, stringr::str_length(x))))
     } else if (truncate == "middle") {
       beginning_margin = floor(0.5*(max.length-3))
       end_margin = ceiling(0.5*(max.length-3))
-      return(paste0(str_sub(x, 1, beginning_margin), "...", str_sub(x, str_length(x) - end_margin + 1, str_length(x))))
+      return(paste0(stringr::str_sub(x, 1, beginning_margin), "...", stringr::str_sub(x, stringr::str_length(x) - end_margin + 1, stringr::str_length(x))))
     }
 
   } else {
 
     if (pad == "end") {
-      return(paste0(x, str_c(rep("&nbsp;", max.length - str_length(x)), collapse = "")))
+      return(paste0(x, stringr::str_c(rep("&nbsp;", max.length - stringr::str_length(x)), collapse = "")))
     } else if (pad == "beginning") {
-      return(paste0(str_c(rep("&nbsp;", max.length - str_length(x)), collapse = ""), x))
+      return(paste0(stringr::str_c(rep("&nbsp;", max.length - stringr::str_length(x)), collapse = ""), x))
     }
 
   }
@@ -72,16 +72,24 @@ getValueVariable = function(type) {
 #' @returns A vector of sorted options.
 getOptionOrder = function(mv_data) {
 
-  df_wide = mv_data[["REGRESSION_MV"]] %>% pivot_wider(names_from = "term", values_from = "statistic", id_cols = c("universe", all_of(mv_data[["REGRESSION_OPTIONS"]])))
+  df_wide = mv_data[["REGRESSION_MV"]] %>% tidyr::pivot_wider(names_from = "term", values_from = "statistic", id_cols = c("universe", all_of(mv_data[["REGRESSION_OPTIONS"]])))
   x = df_wide[,mv_data[["REGRESSION_OPTIONS"]]] %>% as.matrix()
   y = df_wide[,mv_data[["TERMS"]]] %>% as.matrix()
 
   # Impute NAs with the median of the column
-  y = y %>% as.data.frame() %>% mutate(row = row_number()) %>% pivot_longer(-row) %>% group_by(name) %>% mutate(value = case_when(is.na(value) ~ median(value, na.rm = T), .default = value)) %>% pivot_wider(id_cols = row) %>% select(-row) %>% as.matrix()
+  y = y %>%
+    as.data.frame() %>%
+    mutate(row = row_number()) %>%
+    tidyr::pivot_longer(-row) %>%
+    group_by(name) %>%
+    mutate(value = case_when(is.na(value) ~ median(value, na.rm = T), .default = value)) %>%
+    tidyr::pivot_wider(id_cols = row) %>%
+    select(-row) %>%
+    as.matrix()
 
 
   # Use lambda.min from cv.glmnet
-  fit = glmnet(x, y, family = "mgaussian", lambda = cv.glmnet(x, y, family = "mgaussian")$lambda.min)
+  fit = glmnet::glmnet(x, y, family = "mgaussian", lambda = glmnet::cv.glmnet(x, y, family = "mgaussian")$lambda.min)
 
   coefs = tibble(response = character(0), options = character(0), value = numeric(0))
   for (i in 1:length(fit$beta)) {
@@ -100,9 +108,9 @@ getOptionOrder = function(mv_data) {
   # Order first by decision, with the order determined by the maximum magnitude coefficient therein
   # Order second by coefficient magnitude
   coefs %>%
-    replace_na(list(value = 0)) %>%
+    tidyr::replace_na(list(value = 0)) %>%
     mutate(
-      decision = str_match(options, str_c("^", decisions, collapse = "|"))[,1],
+      decision = stringr::str_match(options, stringr::str_c("^", decisions, collapse = "|"))[,1],
       decision = reorder(decision, value, function(x) max(abs(x), na.rm = T))
     ) %>%
     group_by(decision, options) %>%

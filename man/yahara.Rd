@@ -7,7 +7,7 @@
 yahara(
   M,
   fit_name,
-  highlight = exprs(),
+  highlight = rlang::exprs(),
   outcome_branch = "",
   single_term = "",
   conf.level = 0.95

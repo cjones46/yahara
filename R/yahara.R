@@ -12,20 +12,20 @@
 #'
 #' @examples
 #' #yahara(M, "fit_name")
-yahara = function(M, fit_name, highlight = exprs(), outcome_branch = "", single_term = "", conf.level = 0.95) {
+yahara = function(M, fit_name, highlight = rlang::exprs(), outcome_branch = "", single_term = "", conf.level = 0.95) {
 
-  theme_set(theme_bw() + theme(axis.text = element_text(size = 15), axis.title = element_text(size = 18), plot.title = element_markdown(size = 20), plot.subtitle = element_text(size = 15), plot.caption = element_markdown(hjust = 0), axis.ticks.length = unit(0.25, "cm")))
+  theme_set(theme_bw() + theme(axis.text = element_text(size = 15), axis.title = element_text(size = 18), plot.title = ggtext::element_markdown(size = 20), plot.subtitle = element_text(size = 15), plot.caption = ggtext::element_markdown(hjust = 0), axis.ticks.length = unit(0.25, "cm")))
 
   MY_COLORS = list(
     "selected" = "#EE2C2C",
     "default" = "gray40",
     "faded" = "gray80",
-    "sigLines" = muted("blue")
+    "sigLines" = scales::muted("blue")
   )
 
   LONG_MV = multiverse::expand(M) %>%
     multiverse::extract_variables(!!fit_name) %>%
-    unnest( cols = c(!!fit_name) ) %>%
+    tidyr::unnest( cols = c(!!fit_name) ) %>%
     rename("universe" = ".universe") %>%
     select(-c(.parameter_assignment, .code, .results, .errors))
 
@@ -40,7 +40,7 @@ yahara = function(M, fit_name, highlight = exprs(), outcome_branch = "", single_
   }
 
   WIDE_MV = LONG_MV %>%
-    dummy_cols(select_columns = colnames(LONG_MV)[2:(ncol(LONG_MV)-5)],
+    fastDummies::dummy_cols(select_columns = colnames(LONG_MV)[2:(ncol(LONG_MV)-5)],
                #remove_first_dummy = TRUE,
                remove_selected_columns = TRUE) %>%
     filter(term != "(Intercept)")
@@ -50,7 +50,7 @@ yahara = function(M, fit_name, highlight = exprs(), outcome_branch = "", single_
   MULTIVERSE_OPTIONS = colnames(WIDE_MV)[7:ncol(WIDE_MV)] # is 7 always the correct number?
 
   REGRESSION_MV = LONG_MV %>%
-    dummy_cols(select_columns = colnames(LONG_MV)[2:(ncol(LONG_MV)-5)],
+    fastDummies::dummy_cols(select_columns = colnames(LONG_MV)[2:(ncol(LONG_MV)-5)],
                remove_first_dummy = TRUE,
                remove_selected_columns = TRUE) %>%
     filter(term != "(Intercept)")
@@ -168,16 +168,16 @@ yahara = function(M, fit_name, highlight = exprs(), outcome_branch = "", single_
 
     # Define plot outputs via renderPlot() via helpers
     output$pcplot = renderPlot(pcplot_ggplot())
-    output$marginalHist = renderPlot(grid.draw(right_column_grobs()[[1]]))
+    output$marginalHist = renderPlot(grid::grid.draw(right_column_grobs()[[1]]))
     output$heatmap = renderPlot(heatMap_ggplot())
-    output$marginalDecisions = renderPlot(grid.draw(right_column_grobs()[[2]]))
+    output$marginalDecisions = renderPlot(grid::grid.draw(right_column_grobs()[[2]]))
 
 
     # Define Reactive Values
 
     selected_universes = reactiveVal(1:nrow(WIDE_MV)) # By default, all universes are selected.
     if (nrow(LONG_MV %>% filter(!!!highlight) < nrow(LONG_MV))) {
-      selected_universes(LONG_MV %>% filter(!!!highlight) %>% pluck("universe"))
+      selected_universes(LONG_MV %>% filter(!!!highlight) %>% purrr::pluck("universe"))
     }
     selected_option = reactiveVal("none") # The tool can exist without a selected option; we'll use "none" for this.
 
@@ -207,12 +207,20 @@ yahara = function(M, fit_name, highlight = exprs(), outcome_branch = "", single_
     })
     heatMapCoefs = reactive({
 
-      df_wide = REGRESSION_MV %>% pivot_wider(names_from = "term", values_from = target_quantity(), id_cols = c("universe", all_of(REGRESSION_OPTIONS)))
+      df_wide = REGRESSION_MV %>% tidyr::pivot_wider(names_from = "term", values_from = target_quantity(), id_cols = c("universe", all_of(REGRESSION_OPTIONS)))
       x = df_wide[,REGRESSION_OPTIONS] %>% as.matrix()
       y = df_wide[,TERMS] %>% as.matrix()
 
       # Impute NAs with the median of the column
-      y = y %>% as.data.frame() %>% mutate(row = row_number()) %>% pivot_longer(-row) %>% group_by(name) %>% mutate(value = case_when(is.na(value) ~ median(value, na.rm = T), .default = value)) %>% pivot_wider(id_cols = row) %>% select(-row) %>% as.matrix()
+      y = y %>%
+        as.data.frame() %>%
+        mutate(row = row_number()) %>%
+        tidyr::pivot_longer(-row) %>%
+        group_by(name) %>%
+        mutate(value = case_when(is.na(value) ~ median(value, na.rm = T), .default = value)) %>%
+        tidyr::pivot_wider(id_cols = row) %>%
+        select(-row) %>%
+        as.matrix()
 
 
       # Use lambda.min from cv.glmnet
@@ -258,7 +266,7 @@ yahara = function(M, fit_name, highlight = exprs(), outcome_branch = "", single_
         if (nrow(bp) == 0) {
           # do nothing
         } else {
-          selected_term(bp[1, "term"] %>% pluck("term") %>% as.character())
+          selected_term(bp[1, "term"] %>% purrr::pluck("term") %>% as.character())
         }
 
         # Step 3: Update termSelect
@@ -321,7 +329,7 @@ yahara = function(M, fit_name, highlight = exprs(), outcome_branch = "", single_
         )
 
         # Step 1: Update selected outcome
-        selected_term(clickedSpot %>% pluck("response") %>% as.character())
+        selected_term(clickedSpot %>% purrr::pluck("response") %>% as.character())
 
         # Step 2: Update termSelect
         updateSelectizeInput(
@@ -331,7 +339,7 @@ yahara = function(M, fit_name, highlight = exprs(), outcome_branch = "", single_
         )
 
         # Step 3: Update selected option
-        selected_option(clickedSpot %>% pluck("options"))
+        selected_option(clickedSpot %>% purrr::pluck("options"))
 
         # Step 4: Reset selected universes to all
         selected_universes(1:nrow(WIDE_MV))

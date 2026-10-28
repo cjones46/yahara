@@ -114,7 +114,7 @@ pcPlot = function(mv_data, y, universes, outcome, option, topRowScale, sigLinesI
                             ))
       ) +
       theme(legend.position = "none",
-            axis.text.x = element_markdown(angle = 90, hjust = 0.5, vjust = 0.5, face = boldSelected),
+            axis.text.x = ggtext::element_markdown(angle = 90, hjust = 0.5, vjust = 0.5, face = boldSelected),
             axis.ticks.y = element_blank()
       ) +
       labs(x = NULL, y = pretty_value_word, title = myTitle, subtitle = mySubtitle) +

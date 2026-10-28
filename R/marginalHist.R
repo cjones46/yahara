@@ -13,7 +13,7 @@
 #' @returns A ggplot object.
 marginalHist = function(mv_data, y, universes, outcome, option, topRowScale, sigLinesIntercept, pretty_value_word, my_colors) {
 
-  df_wide = mv_data[["WIDE_MV"]] %>% pivot_wider(names_from = "term", values_from = all_of(y), id_cols = c("universe", mv_data[["MULTIVERSE_OPTIONS"]]))
+  df_wide = mv_data[["WIDE_MV"]] %>% tidyr::pivot_wider(names_from = "term", values_from = all_of(y), id_cols = c("universe", mv_data[["MULTIVERSE_OPTIONS"]]))
 
   # If all or none of the universes are selected, and there's no selected option, make it all gray
   if (mean(mv_data[["WIDE_MV"]]$universe %in% universes) %in% 0:1 & option == "none") {
