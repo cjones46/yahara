@@ -18,13 +18,13 @@ yahara(
 
 \item{fit_name}{The name of the object within the multiverse where \code{broom::tidy()} has been run upon the results of a model object.}
 
-\item{highlight}{A call to \code{exprs()} containing a series of comma-separated logical expressions to}
+\item{highlight}{A call to \code{exprs()} containing a series of comma-separated logical expressions to identify universes to highlight.}
 
 \item{outcome_branch}{Works with \code{single_term}. If your multiple estimands come from a single predictor upon multiple outcomes, enter the name of the multiverse branch defining the outcomes here. Leave alone otherwise.}
 
 \item{single_term}{Works with \code{outcome_branch}. If your multiple estimands come from a single predictor upon multiple outcomes, enter the name of the single predictor here. Leave alone otherwise.}
 
-\item{conf.level}{A number in (0, 1) indicating the confidence level at which to annotate dashed lines. Default is 0.95.}
+\item{conf.level}{A number in (0, 1) indicating the confidence level at which to annotate dashed lines.}
 }
 \value{
 Launches a Shiny app.
