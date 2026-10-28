@@ -31,3 +31,6 @@ Imports:
     utils
 URL: https://github.com/cjones46/yahara
 BugReports: https://github.com/cjones46/yahara/issues
+Depends: 
+    R (>= 3.5)
+LazyData: true

@@ -1,0 +1,15 @@
+#' Toy pre-executed multiverse
+#'
+#' Description of Susie's multiverse is in the Yahara paper.
+#'
+#' @format ## `SusiesMultiverse`
+#' A multiverse object of 72 universes, and the following parameters:
+#' \describe{
+#'   \item{age_mismatch}{What to do with respondents that have mismatched ages. Options are remove, recent, and avg.}
+#'   \item{speeding_threshold}{How fast constitutes "too fast". Options are 3 and 5.}
+#'   \item{speeders}{What to do with speeders. Options are remove and nonResponse.}
+#'   \item{skip_threshold}{% of questions that needs to be exceeded to count as a response. Options are 0, 0.1, and 0.2.}
+#'   \item{interaction}{Whether to include the age:income interaction term. Options are yes and no.}
+#' }
+#' @source See Yahara > data-raw > SusiesMultiverse.R.
+"SusiesMultiverse"
