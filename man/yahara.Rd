@@ -33,5 +33,5 @@ Launches a Shiny app.
 Launch Yahara Interface
 }
 \examples{
-#yahara(M, "fit_name")
+#yahara(SusiesMultiverse, "summary_fit")
 }
