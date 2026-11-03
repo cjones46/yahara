@@ -10,7 +10,8 @@ yahara(
   highlight = rlang::exprs(),
   outcome_branch = "",
   single_term = "",
-  conf.level = 0.95
+  conf.level = 0.95,
+  remove_intercept = TRUE
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ yahara(
 \item{single_term}{Works with \code{outcome_branch}. If your multiple estimands come from a single predictor upon multiple outcomes, enter the name of the single predictor here. Leave alone otherwise.}
 
 \item{conf.level}{A number in (0, 1) indicating the confidence level at which to annotate dashed lines.}
+
+\item{remove_intercept}{A logical indicating whether or not to remove a term called \code{(Intercept)}.}
 }
 \value{
 Launches a Shiny app.

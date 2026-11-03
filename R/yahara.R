@@ -6,13 +6,14 @@
 #' @param outcome_branch Works with `single_term`. If your multiple estimands come from a single predictor upon multiple outcomes, enter the name of the multiverse branch defining the outcomes here. Leave alone otherwise.
 #' @param single_term Works with `outcome_branch`. If your multiple estimands come from a single predictor upon multiple outcomes, enter the name of the single predictor here. Leave alone otherwise.
 #' @param conf.level A number in (0, 1) indicating the confidence level at which to annotate dashed lines.
+#' @param remove_intercept A logical indicating whether or not to remove a term called `(Intercept)`.
 #'
 #' @return Launches a Shiny app.
 #' @export
 #'
 #' @examples
 #' #yahara(SusiesMultiverse, "summary_fit")
-yahara = function(M, fit_name, highlight = rlang::exprs(), outcome_branch = "", single_term = "", conf.level = 0.95) {
+yahara = function(M, fit_name, highlight = rlang::exprs(), outcome_branch = "", single_term = "", conf.level = 0.95, remove_intercept = TRUE) {
 
   theme_set(theme_bw() + theme(axis.text = element_text(size = 15), axis.title = element_text(size = 18), plot.title = ggtext::element_markdown(size = 20), plot.subtitle = element_text(size = 15), plot.caption = ggtext::element_markdown(hjust = 0), axis.ticks.length = unit(0.25, "cm")))
 
@@ -29,8 +30,6 @@ yahara = function(M, fit_name, highlight = rlang::exprs(), outcome_branch = "", 
     rename("universe" = ".universe") %>%
     select(-c(.parameter_assignment, .code, .results, .errors))
 
-  # everything comes from LONG_MV... this is where I should incorporate it.
-
   if (outcome_branch != "") {
     LONG_MV = LONG_MV %>%
       filter(term == single_term) %>%
@@ -42,8 +41,12 @@ yahara = function(M, fit_name, highlight = rlang::exprs(), outcome_branch = "", 
   WIDE_MV = LONG_MV %>%
     fastDummies::dummy_cols(select_columns = colnames(LONG_MV)[2:(ncol(LONG_MV)-5)],
                #remove_first_dummy = TRUE,
-               remove_selected_columns = TRUE) %>%
-    filter(term != "(Intercept)")
+               remove_selected_columns = TRUE)
+
+    if (remove_intercept) {
+      WIDE_MV = WIDE_MV %>%
+        filter(term != "(Intercept)")
+    }
 
   TERMS = WIDE_MV %>% distinct(term) %>% pull(term)
 
@@ -52,8 +55,12 @@ yahara = function(M, fit_name, highlight = rlang::exprs(), outcome_branch = "", 
   REGRESSION_MV = LONG_MV %>%
     fastDummies::dummy_cols(select_columns = colnames(LONG_MV)[2:(ncol(LONG_MV)-5)],
                remove_first_dummy = TRUE,
-               remove_selected_columns = TRUE) %>%
-    filter(term != "(Intercept)")
+               remove_selected_columns = TRUE)
+
+  if (remove_intercept) {
+    REGRESSION_MV = REGRESSION_MV %>%
+      filter(term != "(Intercept)")
+  }
 
   REGRESSION_OPTIONS = colnames(REGRESSION_MV)[7:ncol(REGRESSION_MV)]
 
