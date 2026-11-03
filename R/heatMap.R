@@ -50,7 +50,8 @@ myHeatMap = function(data, outcome, option, option_order, pretty_ordering_word, 
                  #axis.ticks.x = element_line()
                  panel.grid = element_blank(),
                  axis.text.y = element_text(color = "transparent"),
-                 axis.text.x = element_blank()
+                 axis.text.x = element_blank(),
+                 panel.border = element_rect(color = my_colors[["selected"]])
            ) +
            scale_x_discrete(
              sec.axis = dup_axis(name = NULL, labels = NULL,
@@ -69,5 +70,5 @@ myHeatMap = function(data, outcome, option, option_order, pretty_ordering_word, 
                                    )
                                  ))
            ) +
-           labs(x = NULL, y = "", fill = NULL, caption = paste0("<span style = 'font-size:20pt'>Effects of Multiverse Options on ", pretty_value_word, ": <span style = 'color:#EE2C2C'>Click</span> me!<br><span style = 'font-size:15pt'>White rows represent reference categories.<br></span>")))
+           labs(x = NULL, y = "", fill = NULL, caption = paste0("<span style = 'font-size:20pt'>Effects of Multiverse Options on ", pretty_value_word, "<br><span style = 'font-size:15pt'>White rows represent reference categories.<br></span>")))
 }

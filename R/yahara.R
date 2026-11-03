@@ -109,9 +109,10 @@ yahara = function(M, fit_name, highlight = rlang::exprs(), outcome_branch = "", 
   OPTION_ORDER = getOptionOrder(MV_DATA)
 
   ui = fluidPage(
+    h4("Click or brush the parallel coordinates plot to focus on a term or highlight universes. Click the heatmap to highlight effects."),
     fluidRow(
       column(width = 3,
-             radioButtons("valueTypeSelect", "Which target quantity to Use?",
+             radioButtons("valueTypeSelect", "Which target quantity to use?",
                           c("Test Statistics", "P-values"),
                           selected = "Test Statistics")
       ),

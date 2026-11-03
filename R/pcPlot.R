@@ -92,7 +92,7 @@ pcPlot = function(mv_data, y, universes, outcome, option, topRowScale, sigLinesI
              yend = Inf,
              color = "black", linewidth = 1.5)
 
-  myTitle = paste0("All ", pretty_value_word, ": <span style = 'color:#EE2C2C'>Click</span> or <span style = 'color:#EE2C2C'>Brush</span> me!")
+  myTitle = paste0("All ", pretty_value_word)
   mySubtitle = ifelse(option != "none", paste0("Colored by ", option), ifelse(mean(df$universe %in% universes) %in% 0:1, "", "Colored by Custom Selection"))
   boldSelected = rep("plain", length(term_order))
   boldSelected[which(term_order == outcome)] = "bold"
@@ -115,7 +115,8 @@ pcPlot = function(mv_data, y, universes, outcome, option, topRowScale, sigLinesI
       ) +
       theme(legend.position = "none",
             axis.text.x = ggtext::element_markdown(angle = 90, hjust = 0.5, vjust = 0.5, face = boldSelected),
-            axis.ticks.y = element_blank()
+            axis.ticks.y = element_blank(),
+            panel.border = element_rect(color = my_colors[["selected"]])
       ) +
       labs(x = NULL, y = pretty_value_word, title = myTitle, subtitle = mySubtitle) +
       geom_hline(linetype = "dashed", color = my_colors[["sigLines"]], yintercept = c(-1, 1) * sigLinesIntercept, na.rm = T)
