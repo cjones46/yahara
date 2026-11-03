@@ -13,11 +13,7 @@
 marginalHist = function(mv_data, y, universes, outcome, option, topRowScale, sigLinesIntercept, my_colors) {
 
   df_wide = mv_data[["WIDE_MV"]] %>% tidyr::pivot_wider(names_from = "term", values_from = all_of(y), id_cols = c("universe", mv_data[["ALL_OPTIONS"]]))
-
-  # if I couldn't automatically figure out a nice sigLinesIntercept, make it 0 so it doesn't throw a warning
-  if (is.na(sigLinesIntercept)) {
-    sigLinesIntercept = 0
-  }
+  myBoundary = ifelse(is.na(sigLinesIntercept), 0, sigLinesIntercept)
 
   # If all or none of the universes are selected, and there's no selected option, make it all gray
   if (mean(mv_data[["WIDE_MV"]]$universe %in% universes) %in% 0:1 & option == "none") {
@@ -31,20 +27,20 @@ marginalHist = function(mv_data, y, universes, outcome, option, topRowScale, sig
     plot = ggplot(data = NULL, aes(y = .data[[outcome]])) +
       geom_histogram(data = df_wide %>% filter(.data[[option]]),
                      color = "black", fill = my_colors[["selected"]],
-                     bins = 30, boundary = sigLinesIntercept, na.rm = T) +
+                     bins = 30, boundary = myBoundary, na.rm = T) +
       geom_histogram(data = df_wide %>% filter(!.data[[option]]),
                      color = "black", fill = my_colors[["faded"]], alpha = 0.5,
-                     bins = 30, boundary = sigLinesIntercept, na.rm = T)
+                     bins = 30, boundary = myBoundary, na.rm = T)
 
     # Otherwise, color by partial brush selection
   } else {
     plot = ggplot(data = NULL, aes(y = .data[[outcome]])) +
       geom_histogram(data = df_wide %>% filter(universe %in% universes),
                      color = "black", fill = my_colors[["selected"]],
-                     bins = 30, boundary = sigLinesIntercept, na.rm = T) +
+                     bins = 30, boundary = myBoundary, na.rm = T) +
       geom_histogram(data = df_wide %>% filter(!universe %in% universes),
                      color = "black", fill = my_colors[["faded"]], alpha = 0.5,
-                     bins = 30, boundary = sigLinesIntercept, na.rm = T)
+                     bins = 30, boundary = myBoundary, na.rm = T)
 
   }
 
