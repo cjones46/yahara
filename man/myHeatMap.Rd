@@ -9,11 +9,10 @@ myHeatMap(
   outcome,
   option,
   option_order,
-  pretty_ordering_word,
   term_order,
-  pretty_value_word,
   transparent_y_axis_label,
-  my_colors
+  my_colors,
+  target_quantity
 )
 }
 \arguments{
@@ -25,15 +24,13 @@ myHeatMap(
 
 \item{option_order}{The result of \code{getOptionOrder()}, a character vector indicating the order of the terms.}
 
-\item{pretty_ordering_word}{A string to be used in the title indicating what target quantity is being graphed.}
-
 \item{term_order}{The result of \code{getOptionOrder()}, a character vector indicating the order of the terms.}
-
-\item{pretty_value_word}{A string to be used in the title indicating what target quantity is being graphed.}
 
 \item{transparent_y_axis_label}{The longest y-axis label from the parallel coordinates plot, to ensure widths are consistent.}
 
 \item{my_colors}{A Yahara-specific list of colors.}
+
+\item{target_quantity}{A string, the target quantity variable name, just used in the title.}
 }
 \value{
 A ggplot object.

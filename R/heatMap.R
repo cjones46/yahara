@@ -4,14 +4,13 @@
 #' @param outcome A string indicating what term, if any, has been selected.
 #' @param option A string indicating what option, if any, has been selected.
 #' @param option_order The result of `getOptionOrder()`, a character vector indicating the order of the terms.
-#' @param pretty_ordering_word A string to be used in the title indicating what target quantity is being graphed.
 #' @param term_order The result of `getOptionOrder()`, a character vector indicating the order of the terms.
-#' @param pretty_value_word A string to be used in the title indicating what target quantity is being graphed.
 #' @param transparent_y_axis_label The longest y-axis label from the parallel coordinates plot, to ensure widths are consistent.
 #' @param my_colors A Yahara-specific list of colors.
+#' @param target_quantity A string, the target quantity variable name, just used in the title.
 #'
 #' @returns A ggplot object.
-myHeatMap = function(data, outcome, option, option_order, pretty_ordering_word, term_order, pretty_value_word, transparent_y_axis_label, my_colors) {
+myHeatMap = function(data, outcome, option, option_order, term_order, transparent_y_axis_label, my_colors, target_quantity) {
   myMargin = 0.5
   m = max(abs(data$value), na.rm = T)
 
@@ -70,5 +69,5 @@ myHeatMap = function(data, outcome, option, option_order, pretty_ordering_word, 
                                    )
                                  ))
            ) +
-           labs(x = NULL, y = "", fill = NULL, caption = paste0("<span style = 'font-size:20pt'>Effects of Multiverse Options on ", pretty_value_word, "<br><span style = 'font-size:15pt'>White rows represent reference categories.<br></span>")))
+           labs(x = NULL, y = "", fill = NULL, caption = paste0("<span style = 'font-size:20pt'>Effects of Multiverse Options on ", target_quantity, "<br><span style = 'font-size:15pt'>White rows represent reference categories.<br></span>")))
 }

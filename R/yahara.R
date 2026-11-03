@@ -114,7 +114,7 @@ yahara = function(M, fit_name, term_col = "term", target_cols = c("statistic", "
   )
 
   # these can stay!
-  INITIAL_TERM_ORDER = WIDE_MV %>% group_by(term) %>% summarize(s = sd(statistic, na.rm = T)) %>% arrange(desc(s)) %>% pull(term)
+  INITIAL_TERM_ORDER = WIDE_MV %>% group_by(term) %>% summarize(s = sd(.data[[target_cols[1]]], na.rm = T)) %>% arrange(desc(s)) %>% pull(term)
   TERM_SELECT_BOX_LABEL = "Focus on a term by clicking on the line plot, or by selecting it here."
   OPTION_ORDER = getOptionOrder(MV_DATA)
 
@@ -123,8 +123,8 @@ yahara = function(M, fit_name, term_col = "term", target_cols = c("statistic", "
     fluidRow(
       column(width = 3,
              radioButtons("valueTypeSelect", "Which target quantity to use?",
-                          c("Test Statistics", "P-values"),
-                          selected = "Test Statistics")
+                          target_cols,
+                          selected = target_cols[1])
       ),
       column(width = 3,
              selectizeInput("termSelect", TERM_SELECT_BOX_LABEL, INITIAL_TERM_ORDER, INITIAL_TERM_ORDER[1]),
@@ -144,10 +144,10 @@ yahara = function(M, fit_name, term_col = "term", target_cols = c("statistic", "
 
   server = function(input, output, session) {
 
-    pcplot_ggplot = reactive(pcPlot(MV_DATA, target_quantity(), selected_universes(), selected_term(), selected_option(), topRowScale(), sigLinesIntercept(), input$valueTypeSelect, term_order(), MY_COLORS))
-    marginalHist_ggplot = reactive(marginalHist(MV_DATA, target_quantity(), selected_universes(), selected_term(), selected_option(), topRowScale(), sigLinesIntercept(), input$valueTypeSelect, MY_COLORS))
-    heatMap_ggplot = reactive(myHeatMap(heatMapCoefs(), selected_term(), selected_option(), OPTION_ORDER, input$optionOrderSelect, term_order(), input$valueTypeSelect, get_guide_data(pcplot_ggplot(), "y")$.label[which.max(nchar(get_guide_data(pcplot_ggplot(), "y")$.label))], MY_COLORS))
-    lollipop_ggplot = reactive(marginalDecisions(MV_DATA, selected_universes(), selected_option(), OPTION_ORDER, input$optionOrderSelect, MY_COLORS))
+    pcplot_ggplot = reactive(pcPlot(MV_DATA, target_quantity(), selected_universes(), selected_term(), selected_option(), topRowScale(), sigLinesIntercept(), term_order(), MY_COLORS, target_cols))
+    marginalHist_ggplot = reactive(marginalHist(MV_DATA, target_quantity(), selected_universes(), selected_term(), selected_option(), topRowScale(), sigLinesIntercept(), MY_COLORS))
+    heatMap_ggplot = reactive(myHeatMap(heatMapCoefs(), selected_term(), selected_option(), OPTION_ORDER, term_order(), get_guide_data(pcplot_ggplot(), "y")$.label[which.max(nchar(get_guide_data(pcplot_ggplot(), "y")$.label))], MY_COLORS, target_quantity()))
+    lollipop_ggplot = reactive(marginalDecisions(MV_DATA, selected_universes(), selected_option(), OPTION_ORDER, MY_COLORS))
 
     right_column_grobs = reactive({
       pcplot_grob = ggplotGrob(pcplot_ggplot())
@@ -192,7 +192,7 @@ yahara = function(M, fit_name, term_col = "term", target_cols = c("statistic", "
     }
     selected_option = reactiveVal("none") # The tool can exist without a selected option; we'll use "none" for this.
 
-    target_quantity = reactive(getValueVariable(input$valueTypeSelect))
+    target_quantity = reactive(input$valueTypeSelect)
 
     term_order = reactive(WIDE_MV %>%
                             group_by(term) %>%
@@ -201,7 +201,7 @@ yahara = function(M, fit_name, term_col = "term", target_cols = c("statistic", "
                             pull(term)
     )
     # statistic is the default selected value
-    selected_term = reactiveVal(WIDE_MV %>% group_by(term) %>% summarize(s = sd(statistic, na.rm = T)) %>% arrange(desc(s)) %>% pull(term) %>% .[1])
+    selected_term = reactiveVal(WIDE_MV %>% group_by(term) %>% summarize(s = sd(.data[[target_cols[1]]], na.rm = T)) %>% arrange(desc(s)) %>% pull(term) %>% .[1])
 
     topRowScale = reactive({
       range = summarize(WIDE_MV, low = min(.data[[target_quantity()]]),
@@ -210,9 +210,9 @@ yahara = function(M, fit_name, term_col = "term", target_cols = c("statistic", "
       return(list("low" = range$low, "high" = range$high, "margin" = 0.1*width))
     })
     sigLinesIntercept = reactive({
-      ifelse(input$valueTypeSelect == "Test Statistics",
+      ifelse(input$valueTypeSelect == "statistic",
              qnorm(1 - (1-conf.level)/2),
-             ifelse(input$valueTypeSelect == "P-values",
+             ifelse(input$valueTypeSelect == "p.value",
                     1-conf.level,
                     NA))
     })

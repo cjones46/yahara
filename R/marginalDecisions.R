@@ -4,11 +4,10 @@
 #' @param universes A numeric vector of universes to highlight, either via brushing or the highlight argument.
 #' @param option A string indicating which option has been selected, if any.
 #' @param option_order A character vector indicating the order of the options.
-#' @param pretty_ordering_word A string to be used in the title indicating how the options are being ordered. Note to self - this argument is no longer used.
 #' @param my_colors A Yahara-specific list of colors.
 #'
 #' @returns A ggplot object.
-marginalDecisions = function(mv_data, universes, option, option_order, pretty_ordering_word, my_colors) {
+marginalDecisions = function(mv_data, universes, option, option_order, my_colors) {
 
   if (option != "none") {
     lollipop_data = mv_data[["WIDE_MV"]] %>%

@@ -51,20 +51,6 @@ heatMapExtractionHelper = function(i, x, mv_data) {
   return(col)
 }
 
-
-#' Internal helper function to convert the radio buttons to the appropriate variable name.
-#'
-#' @param type The value of the radio buttons, "Test Statistics" or "P-values".
-#'
-#' @returns A string variable name, "statistic" or "p.value".
-getValueVariable = function(type) {
-  if (type == "Test Statistics") {
-    return("statistic")
-  } else if (type == "P-values") {
-    return("p.value")
-  }
-}
-
 #' Internal helper function that returns the option order for this set of multiverse data.
 #'
 #' @param mv_data Yahara-specific list of multiverse related data.

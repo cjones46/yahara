@@ -7,12 +7,12 @@
 #' @param option A string indicating whether there is a selected option.
 #' @param topRowScale A reactive() coming from Yahara that helps with the margins for the top row.
 #' @param sigLinesIntercept A number that indicates where the confidence level lines should be annotated.
-#' @param pretty_value_word A string to be used in the title indicating what target quantity is being graphed.
 #' @param term_order A character vector indicating what order the terms should be plotted in.
 #' @param my_colors A Yahara-specific list of colors.
+#' @param target_cols The user-input list of possible y columns.
 #'
 #' @returns A ggplot object.
-pcPlot = function(mv_data, y, universes, outcome, option, topRowScale, sigLinesIntercept, pretty_value_word, term_order, my_colors) {
+pcPlot = function(mv_data, y, universes, outcome, option, topRowScale, sigLinesIntercept, term_order, my_colors, target_cols) {
 
   df = mv_data[["WIDE_MV"]] %>%
     mutate(term = factor(term, levels = term_order))
@@ -22,8 +22,10 @@ pcPlot = function(mv_data, y, universes, outcome, option, topRowScale, sigLinesI
   combos = expand.grid(unique(df$universe), unique(df$term))
   colnames(combos) = c("universe", "term")
   # The universe-term combinations we need to add on:
-  missing = anti_join(combos, df %>% distinct(universe, term), by = join_by(universe, term)) %>%
-    mutate(estimate = NA, std.error = NA, statistic = NA, p.value = NA)
+  missing = anti_join(combos, df %>% distinct(universe, term), by = join_by(universe, term))
+  for (col in target_cols) {
+    missing[[col]] = NA
+  }
   # Let's merge on their options:
   missing_with_options = left_join(missing, df %>% select(universe, all_of(mv_data[["MULTIVERSE_OPTIONS"]])) %>% distinct(), by = join_by(universe)) %>%
     mutate(term = factor(term, levels = term_order))
@@ -92,7 +94,7 @@ pcPlot = function(mv_data, y, universes, outcome, option, topRowScale, sigLinesI
              yend = Inf,
              color = "black", linewidth = 1.5)
 
-  myTitle = paste0("All ", pretty_value_word)
+  myTitle = paste0(y, " Distributions")
   mySubtitle = ifelse(option != "none", paste0("Colored by ", option), ifelse(mean(df$universe %in% universes) %in% 0:1, "", "Colored by Custom Selection"))
   boldSelected = rep("plain", length(term_order))
   boldSelected[which(term_order == outcome)] = "bold"
@@ -104,7 +106,8 @@ pcPlot = function(mv_data, y, universes, outcome, option, topRowScale, sigLinesI
         labels = v_str_force(term_order, truncate = "middle")
       ) +
       scale_y_continuous(
-        limits = c(ifelse(pretty_value_word == "P-values", -0.05, topRowScale[["low"]] - topRowScale[["margin"]]), topRowScale[["high"]] + topRowScale[["margin"]]),
+        # Trying to implement intelligent limits in case there's a p-value being passed in
+        limits = c(ifelse(topRowScale[["low"]] >= 0 & topRowScale[["low"]] <= 0.05, -0.05, topRowScale[["low"]] - topRowScale[["margin"]]), topRowScale[["high"]] + topRowScale[["margin"]]),
         sec.axis = dup_axis(name = NULL,
                             labels = NULL,
                             guide = guide_axis(
@@ -118,7 +121,7 @@ pcPlot = function(mv_data, y, universes, outcome, option, topRowScale, sigLinesI
             axis.ticks.y = element_blank(),
             panel.border = element_rect(color = my_colors[["selected"]])
       ) +
-      labs(x = NULL, y = pretty_value_word, title = myTitle, subtitle = mySubtitle) +
+      labs(x = NULL, y = y, title = myTitle, subtitle = mySubtitle) +
       geom_hline(linetype = "dashed", color = my_colors[["sigLines"]], yintercept = c(-1, 1) * sigLinesIntercept, na.rm = T)
   )
 }

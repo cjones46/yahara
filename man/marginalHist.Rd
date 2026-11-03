@@ -12,7 +12,6 @@ marginalHist(
   option,
   topRowScale,
   sigLinesIntercept,
-  pretty_value_word,
   my_colors
 )
 }
@@ -30,8 +29,6 @@ marginalHist(
 \item{topRowScale}{A reactive() coming from Yahara that helps with the top row margins.}
 
 \item{sigLinesIntercept}{A number coming from Yahara that indicates where the significance lines should be annotated.}
-
-\item{pretty_value_word}{A string to be used in the title indicating the target quantity.}
 
 \item{my_colors}{Yahara-specific list of colors.}
 }

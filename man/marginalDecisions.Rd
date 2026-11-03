@@ -4,14 +4,7 @@
 \alias{marginalDecisions}
 \title{Create the marginal decisions plot for the Yahara interface.}
 \usage{
-marginalDecisions(
-  mv_data,
-  universes,
-  option,
-  option_order,
-  pretty_ordering_word,
-  my_colors
-)
+marginalDecisions(mv_data, universes, option, option_order, my_colors)
 }
 \arguments{
 \item{mv_data}{A Yahara-specific list of multiverse data.}
@@ -21,8 +14,6 @@ marginalDecisions(
 \item{option}{A string indicating which option has been selected, if any.}
 
 \item{option_order}{A character vector indicating the order of the options.}
-
-\item{pretty_ordering_word}{A string to be used in the title indicating how the options are being ordered. Note to self - this argument is no longer used.}
 
 \item{my_colors}{A Yahara-specific list of colors.}
 }

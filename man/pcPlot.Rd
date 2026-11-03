@@ -12,9 +12,9 @@ pcPlot(
   option,
   topRowScale,
   sigLinesIntercept,
-  pretty_value_word,
   term_order,
-  my_colors
+  my_colors,
+  target_cols
 )
 }
 \arguments{
@@ -32,11 +32,11 @@ pcPlot(
 
 \item{sigLinesIntercept}{A number that indicates where the confidence level lines should be annotated.}
 
-\item{pretty_value_word}{A string to be used in the title indicating what target quantity is being graphed.}
-
 \item{term_order}{A character vector indicating what order the terms should be plotted in.}
 
 \item{my_colors}{A Yahara-specific list of colors.}
+
+\item{target_cols}{The user-input list of possible y columns.}
 }
 \value{
 A ggplot object.
