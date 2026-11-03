@@ -1,10 +1,12 @@
 #' Launch Yahara Interface
 #'
 #' @param M A multiverse object which has been executed using `multiverse::execute_multiverse()`.
-#' @param fit_name The name of the object within the multiverse where `broom::tidy()` has been run upon the results of a model object.
+#' @param fit_name The name of the object within the multiverse containing tidy result data, with one row per universe-term and one column per target quantity, for example, when `broom::tidy()` has been run upon an `lm` or `glm`.
+#' @param term_col The name of the column within the `fit_name` object indicating the term (X axis for left column in interface).
+#' @param target_cols The names of the columns within the `fit_name` object indicating the target quantities (Y axis for top row in interface).
 #' @param highlight A call to `exprs()` containing a series of comma-separated logical expressions to identify universes to highlight.
-#' @param outcome_branch Works with `single_term`. If your multiple estimands come from a single predictor upon multiple outcomes, enter the name of the multiverse branch defining the outcomes here. Leave alone otherwise.
-#' @param single_term Works with `outcome_branch`. If your multiple estimands come from a single predictor upon multiple outcomes, enter the name of the single predictor here. Leave alone otherwise.
+#' @param outcome_branch Works with `single_term`. If your multiple estimands come from a single predictor upon multiple outcomes, enter the name of the multiverse branch defining the outcomes here.
+#' @param single_term Works with `outcome_branch`. If your multiple estimands come from a single predictor upon multiple outcomes, enter the name of the single predictor as it appears in the `term_col` here.
 #' @param conf.level A number in (0, 1) indicating the confidence level at which to annotate dashed lines.
 #' @param remove_intercept A logical indicating whether or not to remove a term called `(Intercept)`.
 #'
@@ -13,7 +15,7 @@
 #'
 #' @examples
 #' #yahara(SusiesMultiverse, "summary_fit")
-yahara = function(M, fit_name, highlight = rlang::exprs(), outcome_branch = "", single_term = "", conf.level = 0.95, remove_intercept = TRUE) {
+yahara = function(M, fit_name, term_col = "term", target_cols = c("statistic", "p.value"), highlight = rlang::exprs(), outcome_branch = "", single_term = "", conf.level = 0.95, remove_intercept = TRUE) {
 
   theme_set(theme_bw() + theme(axis.text = element_text(size = 15), axis.title = element_text(size = 18), plot.title = ggtext::element_markdown(size = 20), plot.subtitle = element_text(size = 15), plot.caption = ggtext::element_markdown(hjust = 0), axis.ticks.length = unit(0.25, "cm")))
 
@@ -28,7 +30,8 @@ yahara = function(M, fit_name, highlight = rlang::exprs(), outcome_branch = "", 
     multiverse::extract_variables(!!fit_name) %>%
     tidyr::unnest( cols = c(!!fit_name) ) %>%
     rename("universe" = ".universe") %>%
-    select(-c(.parameter_assignment, .code, .results, .errors))
+    select(-c(.parameter_assignment, .code, .results, .errors)) %>%
+    rename("term" = all_of(term_col))
 
   if (outcome_branch != "") {
     LONG_MV = LONG_MV %>%
