@@ -4,10 +4,12 @@
 \alias{getOptionOrder}
 \title{Internal helper function that returns the option order for this set of multiverse data.}
 \usage{
-getOptionOrder(mv_data)
+getOptionOrder(mv_data, target_col)
 }
 \arguments{
 \item{mv_data}{Yahara-specific list of multiverse related data.}
+
+\item{target_col}{Target quantity numeric column from the \code{fit_name} object.}
 }
 \value{
 A vector of sorted options.

@@ -54,13 +54,18 @@ heatMapExtractionHelper = function(i, x, mv_data) {
 #' Internal helper function that returns the option order for this set of multiverse data.
 #'
 #' @param mv_data Yahara-specific list of multiverse related data.
+#' @param target_col Target quantity numeric column from the `fit_name` object.
 #'
 #' @returns A vector of sorted options.
-getOptionOrder = function(mv_data) {
+getOptionOrder = function(mv_data, target_col) {
 
-  df_wide = mv_data[["REGRESSION_MV"]] %>% tidyr::pivot_wider(names_from = "term", values_from = "statistic", id_cols = c("universe", all_of(mv_data[["REGRESSION_OPTIONS"]])))
-  x = df_wide[,mv_data[["REGRESSION_OPTIONS"]]] %>% as.matrix()
-  y = df_wide[,mv_data[["TERMS"]]] %>% as.matrix()
+  df_wide = mv_data[["REGRESSION_MV"]] %>% tidyr::pivot_wider(names_from = "term", values_from = target_col, id_cols = c("universe", any_of(mv_data[["REGRESSION_OPTIONS"]])))
+  x = df_wide %>%
+    select(any_of(mv_data[["REGRESSION_OPTIONS"]])) %>%
+    as.matrix()
+  y = df_wide %>%
+    select(any_of(mv_data[["TERMS"]])) %>%
+    as.matrix()
 
   # Impute NAs with the median of the column
   y = y %>%
@@ -87,10 +92,10 @@ getOptionOrder = function(mv_data) {
                       ))
   }
   coefs = coefs %>% bind_rows(
-    expand.grid(response = mv_data[["TERMS"]], options = setdiff(mv_data[["MULTIVERSE_OPTIONS"]], mv_data[["REGRESSION_OPTIONS"]])) %>% mutate(value = NA)
+    expand.grid(response = mv_data[["TERMS"]], options = setdiff(mv_data[["ALL_OPTIONS"]], mv_data[["REGRESSION_OPTIONS"]])) %>% mutate(value = NA)
   )
 
-  decisions = mv_data[["LONG_MV"]] %>% select(-c(universe, term, estimate, std.error, statistic, p.value)) %>% colnames()
+  decisions = mv_data[["MULTIVERSE_DECISIONS"]]
   # Order first by decision, with the order determined by the maximum magnitude coefficient therein
   # Order second by coefficient magnitude
   coefs %>%

@@ -12,7 +12,12 @@
 #' @returns A ggplot object.
 marginalHist = function(mv_data, y, universes, outcome, option, topRowScale, sigLinesIntercept, my_colors) {
 
-  df_wide = mv_data[["WIDE_MV"]] %>% tidyr::pivot_wider(names_from = "term", values_from = all_of(y), id_cols = c("universe", mv_data[["MULTIVERSE_OPTIONS"]]))
+  df_wide = mv_data[["WIDE_MV"]] %>% tidyr::pivot_wider(names_from = "term", values_from = all_of(y), id_cols = c("universe", mv_data[["ALL_OPTIONS"]]))
+
+  # if I couldn't automatically figure out a nice sigLinesIntercept, make it 0 so it doesn't throw a warning
+  if (is.na(sigLinesIntercept)) {
+    sigLinesIntercept = 0
+  }
 
   # If all or none of the universes are selected, and there's no selected option, make it all gray
   if (mean(mv_data[["WIDE_MV"]]$universe %in% universes) %in% 0:1 & option == "none") {
@@ -51,7 +56,7 @@ marginalHist = function(mv_data, y, universes, outcome, option, topRowScale, sig
       scale_x_continuous(breaks = scales::breaks_pretty(),
                          expand = expansion(c(0, 0.1)),
                          limits = c(0, max(df_wide$universe))) +
-      scale_y_continuous(limits = c(ifelse(topRowScale[["low"]] >= 0 & topRowScale[["low"]] <= 0.05, -0.05, topRowScale[["low"]] - topRowScale[["margin"]]), topRowScale[["high"]] + topRowScale[["margin"]])) +
+      scale_y_continuous(limits = c(topRowScale[["low"]] - topRowScale[["margin"]], topRowScale[["high"]] + topRowScale[["margin"]])) +
       theme(
         axis.ticks = element_blank()
       ) +

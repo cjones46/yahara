@@ -23,16 +23,18 @@ pcPlot = function(mv_data, y, universes, outcome, option, topRowScale, sigLinesI
   colnames(combos) = c("universe", "term")
   # The universe-term combinations we need to add on:
   missing = anti_join(combos, df %>% distinct(universe, term), by = join_by(universe, term))
-  for (col in target_cols) {
-    missing[[col]] = NA
+  # If there are any combinations to add on:
+  if (nrow(missing) > 0) {
+    for (col in target_cols) {
+      missing[[col]] = NA
+    }
+    # Let's merge on their options:
+    missing_with_options = left_join(missing, df %>% select(universe, all_of(mv_data[["ALL_OPTIONS"]])) %>% distinct(), by = join_by(universe)) %>%
+      mutate(term = factor(term, levels = term_order))
+
+    # Finally, add these rows onto df
+    df = bind_rows(df, missing_with_options)
   }
-  # Let's merge on their options:
-  missing_with_options = left_join(missing, df %>% select(universe, all_of(mv_data[["MULTIVERSE_OPTIONS"]])) %>% distinct(), by = join_by(universe)) %>%
-    mutate(term = factor(term, levels = term_order))
-
-  # Finally, add these rows onto df
-  df = bind_rows(df, missing_with_options)
-
   na_percentages = df %>%
     group_by(term) %>%
     summarize(perc_na = mean(is.na(.data[[y]])),
@@ -107,7 +109,7 @@ pcPlot = function(mv_data, y, universes, outcome, option, topRowScale, sigLinesI
       ) +
       scale_y_continuous(
         # Trying to implement intelligent limits in case there's a p-value being passed in
-        limits = c(ifelse(topRowScale[["low"]] >= 0 & topRowScale[["low"]] <= 0.05, -0.05, topRowScale[["low"]] - topRowScale[["margin"]]), topRowScale[["high"]] + topRowScale[["margin"]]),
+        limits = c(topRowScale[["low"]] - topRowScale[["margin"]], topRowScale[["high"]] + topRowScale[["margin"]]),
         sec.axis = dup_axis(name = NULL,
                             labels = NULL,
                             guide = guide_axis(

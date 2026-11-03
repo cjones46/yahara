@@ -21,7 +21,7 @@ marginalDecisions = function(mv_data, universes, option, option_order, my_colors
   }
 
   lollipop_data = lollipop_data %>%
-    select(universe, selected, all_of(mv_data[["MULTIVERSE_OPTIONS"]])) %>%
+    select(universe, selected, all_of(mv_data[["ALL_OPTIONS"]])) %>%
     distinct() %>%
     tidyr::pivot_longer(-c(selected, universe)) %>%
     group_by(name, selected) %>%
@@ -30,7 +30,7 @@ marginalDecisions = function(mv_data, universes, option, option_order, my_colors
     ungroup()
 
   summary_all = mv_data[["WIDE_MV"]] %>%
-    select(universe, all_of(mv_data[["MULTIVERSE_OPTIONS"]])) %>%
+    select(universe, all_of(mv_data[["ALL_OPTIONS"]])) %>%
     distinct() %>%
     select(-universe) %>%
     summarize(across(everything(), mean)) %>%

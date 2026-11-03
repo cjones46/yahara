@@ -41,36 +41,43 @@ yahara = function(M, fit_name, term_col = "term", target_cols = c("statistic", "
       relocate(term, .before = "estimate")
   }
 
-  WIDE_MV = LONG_MV %>%
-    fastDummies::dummy_cols(select_columns = colnames(LONG_MV)[2:(ncol(LONG_MV)-5)],
-               #remove_first_dummy = TRUE,
-               remove_selected_columns = TRUE)
+  MULTIVERSE_DECISIONS = names(multiverse::parameters(M))
 
-    if (remove_intercept) {
-      WIDE_MV = WIDE_MV %>%
-        filter(term != "(Intercept)")
-    }
+  ALL_OPTIONS = multiverse::expand(M_saved) %>%
+    select(all_of(MULTIVERSE_DECISIONS)) %>%
+    fastDummies::dummy_cols(select_columns = MULTIVERSE_DECISIONS, remove_first_dummy = FALSE, remove_selected_columns = T) %>%
+    colnames()
+
+  REGRESSION_OPTIONS = multiverse::expand(M_saved) %>%
+    select(all_of(MULTIVERSE_DECISIONS)) %>%
+    fastDummies::dummy_cols(select_columns = MULTIVERSE_DECISIONS, remove_first_dummy = TRUE, remove_selected_columns = T) %>%
+    colnames()
+
+  WIDE_MV = LONG_MV %>%
+    fastDummies::dummy_cols(select_columns = MULTIVERSE_DECISIONS,
+               remove_first_dummy = FALSE,
+               remove_selected_columns = TRUE)
 
   TERMS = WIDE_MV %>% distinct(term) %>% pull(term)
 
-  MULTIVERSE_OPTIONS = colnames(WIDE_MV)[7:ncol(WIDE_MV)] # is 7 always the correct number?
-
   REGRESSION_MV = LONG_MV %>%
-    fastDummies::dummy_cols(select_columns = colnames(LONG_MV)[2:(ncol(LONG_MV)-5)],
+    fastDummies::dummy_cols(select_columns = MULTIVERSE_DECISIONS,
                remove_first_dummy = TRUE,
                remove_selected_columns = TRUE)
 
   if (remove_intercept) {
+    LONG_MV = LONG_MV %>%
+      filter(term!= "(Intercept)")
+    WIDE_MV = WIDE_MV %>%
+      filter(term != "(Intercept)")
     REGRESSION_MV = REGRESSION_MV %>%
       filter(term != "(Intercept)")
   }
 
-  REGRESSION_OPTIONS = colnames(REGRESSION_MV)[7:ncol(REGRESSION_MV)]
-
   if (outcome_branch != "") {
 
     long_universe_specifications = LONG_MV %>%
-      distinct(across(all_of(colnames(LONG_MV)[2:(length(colnames(LONG_MV))-5)]))) %>%
+      distinct(across(all_of(MULTIVERSE_DECISIONS))) %>%
       mutate(universe = row_number())
 
     LONG_MV = LONG_MV %>%
@@ -79,7 +86,7 @@ yahara = function(M, fit_name, term_col = "term", target_cols = c("statistic", "
                 by = colnames(long_universe_specifications %>% select(-universe)))
 
     wide_universe_specifications = WIDE_MV %>%
-      distinct(across(all_of(MULTIVERSE_OPTIONS))) %>%
+      distinct(across(all_of(ALL_OPTIONS))) %>%
       mutate(universe = row_number())
 
     WIDE_MV = WIDE_MV %>%
@@ -100,7 +107,7 @@ yahara = function(M, fit_name, term_col = "term", target_cols = c("statistic", "
 
   # Change 0/1 dummy_cols columns to T/F for easy filtering
   WIDE_MV = WIDE_MV %>%
-    mutate(across(all_of(MULTIVERSE_OPTIONS), ~ as.logical(.x)))
+    mutate(across(all_of(ALL_OPTIONS), ~ as.logical(.x)))
   REGRESSION_MV = REGRESSION_MV %>%
     mutate(across(all_of(REGRESSION_OPTIONS), ~ as.logical(.x)))
 
@@ -109,14 +116,15 @@ yahara = function(M, fit_name, term_col = "term", target_cols = c("statistic", "
     WIDE_MV = WIDE_MV,
     TERMS = TERMS,
     REGRESSION_MV = REGRESSION_MV,
-    MULTIVERSE_OPTIONS = MULTIVERSE_OPTIONS,
+    MULTIVERSE_DECISIONS = MULTIVERSE_DECISIONS,
+    ALL_OPTIONS = ALL_OPTIONS,
     REGRESSION_OPTIONS = REGRESSION_OPTIONS
   )
 
   # these can stay!
   INITIAL_TERM_ORDER = WIDE_MV %>% group_by(term) %>% summarize(s = sd(.data[[target_cols[1]]], na.rm = T)) %>% arrange(desc(s)) %>% pull(term)
   TERM_SELECT_BOX_LABEL = "Focus on a term by clicking on the line plot, or by selecting it here."
-  OPTION_ORDER = getOptionOrder(MV_DATA)
+  OPTION_ORDER = getOptionOrder(MV_DATA, target_cols[1])
 
   ui = fluidPage(
     h4("Click or brush the parallel coordinates plot to focus on a term or highlight universes. Click the heatmap to highlight effects."),
@@ -204,8 +212,8 @@ yahara = function(M, fit_name, term_col = "term", target_cols = c("statistic", "
     selected_term = reactiveVal(WIDE_MV %>% group_by(term) %>% summarize(s = sd(.data[[target_cols[1]]], na.rm = T)) %>% arrange(desc(s)) %>% pull(term) %>% .[1])
 
     topRowScale = reactive({
-      range = summarize(WIDE_MV, low = min(.data[[target_quantity()]]),
-                        high = max(.data[[target_quantity()]]))
+      range = summarize(WIDE_MV, low = min(.data[[target_quantity()]], na.rm = T),
+                        high = max(.data[[target_quantity()]]), na.rm = T)
       width = range$high-range$low
       return(list("low" = range$low, "high" = range$high, "margin" = 0.1*width))
     })
@@ -247,7 +255,7 @@ yahara = function(M, fit_name, term_col = "term", target_cols = c("statistic", "
                           ))
       }
       coefs = coefs %>% bind_rows(
-        expand.grid(response = TERMS, options = setdiff(MULTIVERSE_OPTIONS, REGRESSION_OPTIONS)) %>% mutate(value = NA)
+        expand.grid(response = TERMS, options = setdiff(ALL_OPTIONS, REGRESSION_OPTIONS)) %>% mutate(value = NA)
       ) %>%
         mutate(response = factor(response, levels = term_order()))
       return(coefs)
