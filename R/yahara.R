@@ -33,6 +33,11 @@ yahara = function(M, fit_name, term_col = "term", target_cols = c("statistic", "
     select(-c(.parameter_assignment, .code, .results, .errors)) %>%
     rename("term" = all_of(term_col))
 
+  if (remove_intercept) {
+    LONG_MV = LONG_MV %>%
+      filter(term != "(Intercept)")
+  }
+
   if (outcome_branch != "") {
     LONG_MV = LONG_MV %>%
       filter(term == single_term) %>%
@@ -43,12 +48,12 @@ yahara = function(M, fit_name, term_col = "term", target_cols = c("statistic", "
 
   MULTIVERSE_DECISIONS = names(multiverse::parameters(M))
 
-  ALL_OPTIONS = multiverse::expand(M_saved) %>%
+  ALL_OPTIONS = multiverse::expand(M) %>%
     select(all_of(MULTIVERSE_DECISIONS)) %>%
     fastDummies::dummy_cols(select_columns = MULTIVERSE_DECISIONS, remove_first_dummy = FALSE, remove_selected_columns = T) %>%
     colnames()
 
-  REGRESSION_OPTIONS = multiverse::expand(M_saved) %>%
+  REGRESSION_OPTIONS = multiverse::expand(M) %>%
     select(all_of(MULTIVERSE_DECISIONS)) %>%
     fastDummies::dummy_cols(select_columns = MULTIVERSE_DECISIONS, remove_first_dummy = TRUE, remove_selected_columns = T) %>%
     colnames()
@@ -66,8 +71,6 @@ yahara = function(M, fit_name, term_col = "term", target_cols = c("statistic", "
                remove_selected_columns = TRUE)
 
   if (remove_intercept) {
-    LONG_MV = LONG_MV %>%
-      filter(term!= "(Intercept)")
     WIDE_MV = WIDE_MV %>%
       filter(term != "(Intercept)")
     REGRESSION_MV = REGRESSION_MV %>%
@@ -275,7 +278,7 @@ yahara = function(M, fit_name, term_col = "term", target_cols = c("statistic", "
         bp = brushedPoints(
           WIDE_MV %>% mutate(term = factor(term, term_order())),
           input$pcplotBrush,
-          yvar = getValueVariable(input$valueTypeSelect)
+          yvar = input$valueTypeSelect
         )
         # Step 1: Update selected universes
         selected_universes(
