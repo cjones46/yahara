@@ -59,6 +59,6 @@ marginalHist = function(mv_data, y, universes, outcome, option, topRowScale, sig
         axis.ticks = element_blank()
       ) +
       labs(x = "\nNumber of Universes", y = NULL, title = myTitle, subtitle = mySubtitle) +
-      geom_hline(linetype = "dashed", color = my_colors[["sigLines"]], yintercept = c(-1, 1) * sigLinesIntercept, na.rm = T)
+      geom_hline(linetype = "dashed", color = my_colors[["sigLines"]], yintercept = c(ifelse(topRowScale[["low"]] > 0, NA, -1), 1) * sigLinesIntercept, na.rm = T)
   )
 }

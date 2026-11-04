@@ -122,6 +122,6 @@ pcPlot = function(mv_data, y, universes, outcome, option, topRowScale, sigLinesI
             axis.ticks.y = element_blank()
       ) +
       labs(x = NULL, y = y, title = myTitle, subtitle = mySubtitle) +
-      geom_hline(linetype = "dashed", color = my_colors[["sigLines"]], yintercept = c(-1, 1) * sigLinesIntercept, na.rm = T)
+      geom_hline(linetype = "dashed", color = my_colors[["sigLines"]], yintercept = c(ifelse(topRowScale[["low"]] > 0, NA, -1), 1) * sigLinesIntercept, na.rm = T)
   )
 }
