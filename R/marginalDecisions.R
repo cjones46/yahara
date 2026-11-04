@@ -42,7 +42,7 @@ marginalDecisions = function(mv_data, universes, option, option_order, my_colors
 
   # Set up the default conditions for the plot
   plot = ggplot(full_data, aes(y = name))
-  additionalSubtitleInfo = "<span style = 'font-size:15pt'>Brush the line plot or click the heat map for more detail here.</span>"
+  additionalSubtitleInfo = ""
   defaultSize = 6
 
   # If there's a partial brush selection OR option, add the lollipop and update additionalSubtitleInfo.

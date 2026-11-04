@@ -49,8 +49,7 @@ myHeatMap = function(data, outcome, option, option_order, term_order, transparen
                  #axis.ticks.x = element_line()
                  panel.grid = element_blank(),
                  axis.text.y = element_text(color = "transparent"),
-                 axis.text.x = element_blank(),
-                 panel.border = element_rect(color = my_colors[["selected"]])
+                 axis.text.x = element_blank()
            ) +
            scale_x_discrete(
              sec.axis = dup_axis(name = NULL, labels = NULL,

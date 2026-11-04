@@ -45,14 +45,16 @@ marginalHist = function(mv_data, y, universes, outcome, option, topRowScale, sig
   }
 
   myTitle = paste0(y, " of:\n", str_force(outcome, max.length = 30))
-  mySubtitle = ifelse(option != "none", paste0("Colored by ", option), ifelse(mean(mv_data[["WIDE_MV"]]$universe %in% universes) %in% 0:1, "Click the line plot or heat map to change this view.", "Colored by Custom Selection"))
+  mySubtitle = ifelse(option != "none", paste0("Colored by ", option), ifelse(mean(mv_data[["WIDE_MV"]]$universe %in% universes) %in% 0:1, "", "Colored by Custom Selection"))
 
   return(
     plot +
       scale_x_continuous(breaks = scales::breaks_pretty(),
                          expand = expansion(c(0, 0.1)),
                          limits = c(0, max(df_wide$universe))) +
-      scale_y_continuous(limits = c(topRowScale[["low"]] - topRowScale[["margin"]], topRowScale[["high"]] + topRowScale[["margin"]])) +
+      scale_y_continuous(
+        limits = c(topRowScale[["low"]] - topRowScale[["margin"]], topRowScale[["high"]] + topRowScale[["margin"]])
+      ) +
       theme(
         axis.ticks = element_blank()
       ) +

@@ -213,7 +213,7 @@ yahara = function(M, fit_name, term_col = "term", target_cols = c("statistic", "
 
     topRowScale = reactive({
       range = summarize(WIDE_MV, low = min(.data[[target_quantity()]], na.rm = T),
-                        high = max(.data[[target_quantity()]]), na.rm = T)
+                        high = max(.data[[target_quantity()]], na.rm = T))
       width = range$high-range$low
       return(list("low" = range$low, "high" = range$high, "margin" = 0.1*width))
     })

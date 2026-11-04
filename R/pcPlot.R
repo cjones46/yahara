@@ -108,7 +108,6 @@ pcPlot = function(mv_data, y, universes, outcome, option, topRowScale, sigLinesI
         labels = v_str_force(term_order, truncate = "middle")
       ) +
       scale_y_continuous(
-        # Trying to implement intelligent limits in case there's a p-value being passed in
         limits = c(topRowScale[["low"]] - topRowScale[["margin"]], topRowScale[["high"]] + topRowScale[["margin"]]),
         sec.axis = dup_axis(name = NULL,
                             labels = NULL,
@@ -120,8 +119,7 @@ pcPlot = function(mv_data, y, universes, outcome, option, topRowScale, sigLinesI
       ) +
       theme(legend.position = "none",
             axis.text.x = ggtext::element_markdown(angle = 90, hjust = 0.5, vjust = 0.5, face = boldSelected),
-            axis.ticks.y = element_blank(),
-            panel.border = element_rect(color = my_colors[["selected"]])
+            axis.ticks.y = element_blank()
       ) +
       labs(x = NULL, y = y, title = myTitle, subtitle = mySubtitle) +
       geom_hline(linetype = "dashed", color = my_colors[["sigLines"]], yintercept = c(-1, 1) * sigLinesIntercept, na.rm = T)
